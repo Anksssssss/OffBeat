@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "123623900663",
+    "project_id": "offbeat-99f8a",
+    "storage_bucket": "offbeat-99f8a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:123623900663:android:30b1616e65a24c47e11af2",
+        "android_client_info": {
+          "package_name": "com.example.offbeat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "123623900663-g6b0f8mubgfpmafifej4pm1pe7gqslm3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.offbeat",
+            "certificate_hash": "ea404d17a432df6008394d81d9949dbbb64bcefc"
+          }
+        },
+        {
+          "client_id": "123623900663-2bt84d9sjbga1ba78e59gpd0106q2515.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAsY8BWxtG7E-bAWQ8OUpwiDKcF9tkzU1o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "123623900663-2bt84d9sjbga1ba78e59gpd0106q2515.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
