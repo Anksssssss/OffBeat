@@ -1,4 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
 
-</selector>
+    <!-- Define the corners to make the rectangle curved -->
+    <corners android:radius="16dp" />
+
+    <!-- Define the stroke to make it dashed -->
+    <stroke
+        android:width="2dp"
+        android:color="#02AAB0"
+    android:dashWidth="16dp"
+    android:dashGap="5dp" />
+
+    <!-- Optionally, you can define a solid color for the background -->
+    <solid android:color="#FFFFFF" /> <!-- Change this to your desired background color -->
+
+</shape>

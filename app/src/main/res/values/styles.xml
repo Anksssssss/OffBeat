@@ -1,3 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="HintTextStyle">
+        <item name="android:textSize">12sp</item> <!-- Change this to your desired hint text size -->
+        <item name="android:textColorHint">#808080</item> <!-- Optional: Change this to your desired hint text color -->
+    </style>
 </resources>

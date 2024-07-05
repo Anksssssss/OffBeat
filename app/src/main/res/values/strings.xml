@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">OffBeat</string>
+    <string name="edittext_hint"><font size="12">Mention the name of the destinantion</font></string>
+    <string name="description_hint"><font size="12">Mention the amazing stories and tips during your visit</font></string>
+    <string name="duration_hint"><font size="12">Nights/Days</font></string>
+    <string name="best_time_hint"><font size="12">Mention the best time to visit</font></string>
+    <string name="direction_guide_hint"><font size="12">Add tips on how to reach the location</font></string>
+    <string name="search_hint"><font size="12">Search</font></string>
 </resources>

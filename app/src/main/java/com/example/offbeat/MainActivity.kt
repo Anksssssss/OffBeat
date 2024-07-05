@@ -8,6 +8,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.offbeat.databinding.ActivityMainBinding
 import com.example.offbeat.ui.login.LoginActivity
+import com.example.offbeat.ui.offbeat.OffbeatDetailsActivity
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
@@ -22,13 +23,20 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-//        val intent = Intent(this, MapsActivity::class.java)
-//        startActivity(intent)
+        setListeners()
+
+    }
+
+    private fun setListeners() {
         binding.btnSighOut.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
             finish()
+        }
+        binding.fab.setOnClickListener {
+            val intent = Intent(this, OffbeatDetailsActivity::class.java)
+            startActivity(intent)
         }
     }
 }

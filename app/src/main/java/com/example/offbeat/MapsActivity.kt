@@ -1,6 +1,10 @@
 package com.example.offbeat
 
+import android.app.Activity
+import android.content.Intent
+import android.location.Geocoder
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -12,6 +16,8 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.libraries.places.api.Places
+import java.util.Locale
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -28,16 +34,66 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             insets
         }
 
+       // Places.initialize(applicationContext, "AIzaSyBBXMVGlYT9D6PtB6pNHjBAmUAahb-9wwY")
+
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.mapFrag) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
+        setListeners()
+
+    }
+
+    private fun setListeners() {
+
+        binding.btnConfirm.setOnClickListener {
+            val selectedLocation = mMap.cameraPosition.target
+            val resultIntent = Intent().apply {
+                putExtra("lat",selectedLocation.latitude)
+                putExtra("lon",selectedLocation.longitude)
+            }
+            setResult(Activity.RESULT_OK, resultIntent)
+            finish()
+        }
+
+        binding.searchBtn.setOnClickListener {
+            val locName = binding.serchEdt.text.toString()
+            if(locName.isNotEmpty()){
+                searchLoaction(locName)
+            }else{
+                Toast.makeText(this,"Please enter a location name",Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun searchLoaction(location: String) {
+        val geocoder = Geocoder(this, Locale.getDefault())
+        try{
+            val addresses = geocoder.getFromLocationName(location,2)
+            if(addresses!!.size > 0) {
+                val address = addresses[0]
+                val latLng = LatLng(address.latitude, address.longitude)
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+              //mMap.addMarker(MarkerOptions().position(latLng).title(location).draggable(true))
+            } else {
+                Toast.makeText(this, "Location not found", Toast.LENGTH_SHORT).show()
+            }
+        }catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Error finding location", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onMapReady(p0: GoogleMap) {
         mMap = p0
         val location = LatLng(28.7041, 77.1025)
-        mMap.addMarker(MarkerOptions().position(location).title("Marker in Delhi"))
+//        mMap.addMarker(MarkerOptions().position(location).title("Marker in Delhi"))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(location))
+
+//        mMap.setOnCameraIdleListener {
+//            val centerPosition = mMap.cameraPosition.target
+//            mMap.clear()
+//            mMap.addMarker(MarkerOptions().position(centerPosition).title(""))
+//        }
     }
 }
