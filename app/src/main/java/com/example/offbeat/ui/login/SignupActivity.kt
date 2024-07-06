@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.offbeat.R
 import com.example.offbeat.databinding.ActivitySignupBinding
 import com.example.offbeat.models.User
+import com.example.offbeat.utils.SharedPrefManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -83,6 +84,10 @@ class SignupActivity : AppCompatActivity() {
                         .set(newUser)
                         .addOnSuccessListener {
                             Log.d("SignUp", "User data added to Firestore")
+
+                            val sharedPrefManager = SharedPrefManager(this)
+                            sharedPrefManager.saveUser(name, email)
+
                             Toast.makeText(baseContext, "Sign Up Successful.", Toast.LENGTH_SHORT)
                                 .show()
                             auth.signOut()

@@ -16,12 +16,14 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.offbeat.MainActivity
 import com.example.offbeat.MapsActivity
 import com.example.offbeat.R
 import com.example.offbeat.adapter.PhotosAdapter
 import com.example.offbeat.databinding.ActivityOffbeatDetailsBinding
 import com.example.offbeat.models.OffbeatDetail
 import com.example.offbeat.ui.login.LoginActivity
+import com.example.offbeat.utils.SharedPrefManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -135,33 +137,44 @@ class OffbeatDetailsActivity : AppCompatActivity() {
 
 
     private fun addOffbeatLocationDetails(
-        name: String,
+        locationName: String,
         description: String,
         stayDuration: String,
         bestTime: String,
         address: String,
         id: String
     ) {
+        val sharedPrefManager = SharedPrefManager(this)
+        val name = sharedPrefManager.getUserName()?:""
         val offbeatDetails = OffbeatDetail(
-            id, name, description, stayDuration, bestTime, address, photoUrls,
+            id, name, locationName,  description, stayDuration, bestTime, address, photoUrls,
             latitude,
             longitude
         )
         val db = FirebaseFirestore.getInstance()
-        db.collection("OffBeatLocations").document(id)
-            .set(offbeatDetails)
-            .addOnSuccessListener {
-                Log.d("Upload", "Offbeat location data added to Firestore")
-                Toast.makeText(baseContext, "Upload Successful", Toast.LENGTH_SHORT)
-                    .show()
 
-            }.addOnFailureListener { e ->
+        db.collection("users").document(id)
+            .collection("OffBeatLocations")
+            .add(offbeatDetails).addOnSuccessListener {
+                db.collection("OffBeatLocations")
+                    .add(offbeatDetails)
+                    .addOnSuccessListener {
+                        Log.d("Upload", "Offbeat location data added to Firestore")
+                        Toast.makeText(baseContext, "Upload Successful", Toast.LENGTH_SHORT)
+                            .show()
+                        startActivity(Intent(this, MainActivity::class.java))
+                        finish()
+
+                    }.addOnFailureListener { e ->
+                        Log.w("Upload", "Error adding offbeat location to Firestore", e)
+                        Toast.makeText(
+                            baseContext,
+                            "Failed to upload ${e.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+            }.addOnFailureListener { e->
                 Log.w("Upload", "Error adding offbeat location to Firestore", e)
-                Toast.makeText(
-                    baseContext,
-                    "Failed to upload ${e.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
             }
     }
 
