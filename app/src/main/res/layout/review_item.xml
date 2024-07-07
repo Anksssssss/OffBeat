@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="4dp"
+    android:layout_marginBottom="3dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/userName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ankit Prakash"
+        android:textStyle="bold"
+        android:textAlignment="textStart"
+        android:textColor="@color/black"
+        android:textSize="15sp"/>
+
+    <TextView
+        android:id="@+id/reviewTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="This place is awesome"
+        android:textAlignment="textStart"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:id="@+id/timeTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="7 June 2024"
+        android:textStyle="italic"
+        android:textAlignment="textEnd"
+        android:textSize="13sp"/>
+
+</LinearLayout>

@@ -19,6 +19,7 @@ import com.example.offbeat.ui.offbeat.OffbeatInfoActivity
 import com.example.offbeat.utils.DataHolder
 import com.example.offbeat.utils.OnItemClickListener
 import com.example.offbeat.utils.Result
+import com.example.offbeat.utils.SharedPrefManager
 import com.example.offbeat.viewmodels.OffbeatLocationViewModel
 import com.google.firebase.auth.FirebaseAuth
 
@@ -94,7 +95,11 @@ class MainActivity : AppCompatActivity(), OnItemClickListener {
     private fun setListeners() {
         binding.btnSighOut.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
-            val intent = Intent(this, LoginActivity::class.java)
+            val sharedPrefManager = SharedPrefManager(this)
+            sharedPrefManager.clearuser()
+            val intent = Intent(this, LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
             startActivity(intent)
             finish()
         }

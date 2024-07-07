@@ -10,7 +10,9 @@ data class OffbeatDetail(
     val address: String,
     val photos: MutableList<String>,
     val latitude: String = "",
-    val longitude: String = ""
+    val longitude: String = "",
+    var offBeatId: String = "",
+    var reviewList: MutableList<Review> = mutableListOf()
 ){
     constructor() : this(
         userId = "",

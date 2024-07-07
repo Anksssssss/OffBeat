@@ -153,6 +153,7 @@ class OffbeatDetailsActivity : AppCompatActivity() {
         )
         val db = FirebaseFirestore.getInstance()
 
+
         db.collection("users").document(id)
             .collection("OffBeatLocations")
             .add(offbeatDetails).addOnSuccessListener {
