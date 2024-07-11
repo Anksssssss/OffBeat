@@ -34,7 +34,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             insets
         }
 
-       // Places.initialize(applicationContext, "AIzaSyBBXMVGlYT9D6PtB6pNHjBAmUAahb-9wwY")
+        // Places.initialize(applicationContext, "AIzaSyBBXMVGlYT9D6PtB6pNHjBAmUAahb-9wwY")
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.mapFrag) as SupportMapFragment
@@ -49,8 +49,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.btnConfirm.setOnClickListener {
             val selectedLocation = mMap.cameraPosition.target
             val resultIntent = Intent().apply {
-                putExtra("lat",selectedLocation.latitude)
-                putExtra("lon",selectedLocation.longitude)
+                putExtra("lat", selectedLocation.latitude)
+                putExtra("lon", selectedLocation.longitude)
             }
             setResult(Activity.RESULT_OK, resultIntent)
             finish()
@@ -58,27 +58,27 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         binding.searchBtn.setOnClickListener {
             val locName = binding.serchEdt.text.toString()
-            if(locName.isNotEmpty()){
+            if (locName.isNotEmpty()) {
                 searchLoaction(locName)
-            }else{
-                Toast.makeText(this,"Please enter a location name",Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Please enter a location name", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     private fun searchLoaction(location: String) {
         val geocoder = Geocoder(this, Locale.getDefault())
-        try{
-            val addresses = geocoder.getFromLocationName(location,2)
-            if(addresses!!.size > 0) {
+        try {
+            val addresses = geocoder.getFromLocationName(location, 2)
+            if (addresses!!.size > 0) {
                 val address = addresses[0]
                 val latLng = LatLng(address.latitude, address.longitude)
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
-              //mMap.addMarker(MarkerOptions().position(latLng).title(location).draggable(true))
+                //mMap.addMarker(MarkerOptions().position(latLng).title(location).draggable(true))
             } else {
                 Toast.makeText(this, "Location not found", Toast.LENGTH_SHORT).show()
             }
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(this, "Error finding location", Toast.LENGTH_SHORT).show()
         }

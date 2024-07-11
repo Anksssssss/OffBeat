@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -23,6 +24,7 @@ import com.example.offbeat.adapter.PhotosAdapter
 import com.example.offbeat.databinding.ActivityOffbeatDetailsBinding
 import com.example.offbeat.models.OffbeatDetail
 import com.example.offbeat.ui.login.LoginActivity
+import com.example.offbeat.ui.login.Result
 import com.example.offbeat.utils.SharedPrefManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -35,6 +37,7 @@ class OffbeatDetailsActivity : AppCompatActivity() {
     private lateinit var photosAdapter: PhotosAdapter
     private lateinit var mapActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var imageActivityResultLauncher: ActivityResultLauncher<Intent>
+    private val viewModel: OffbeatDetailViewModel by viewModels()
     private var latitude = ""
     private var longitude = ""
 
@@ -74,27 +77,75 @@ class OffbeatDetailsActivity : AppCompatActivity() {
 
         initView()
         setListeners()
+        setObservers()
+    }
+
+    private fun setObservers() {
+        viewModel.uploadImageStatus.observe(this){result->
+            when(result){
+                is com.example.offbeat.utils.Result.Loading->{
+                    binding.apply {
+                        placeholderImg.visibility = View.GONE
+                        selectorTv1.visibility = View.GONE
+                        selectorTv2.visibility = View.GONE
+                        progressBar.visibility = View.VISIBLE
+                    }
+                }
+                is com.example.offbeat.utils.Result.Success->{
+                    storeImageUrlInFirestore(result.data)
+                }
+                is com.example.offbeat.utils.Result.Error -> {
+                    Log.e("Error", result.exception.toString())
+                }
+            }
+        }
+
+        viewModel.uploadStatus.observe(this){result->
+            when(result){
+                is com.example.offbeat.utils.Result.Loading->{
+                   binding.apply {
+                       btnUpload.visibility = View.GONE
+                       progressBarUpload.visibility = View.VISIBLE
+                   }
+                }
+                is com.example.offbeat.utils.Result.Success->{
+                    binding.progressBarUpload.visibility = View.GONE
+                    Log.d("Upload", "Offbeat location data added to Firestore")
+                    Toast.makeText(baseContext, "Upload Successful", Toast.LENGTH_SHORT)
+                        .show()
+                    startActivity(Intent(this, MainActivity::class.java))
+                    finish()
+                }
+                is com.example.offbeat.utils.Result.Error -> {
+                    binding.apply {
+                        btnUpload.visibility = View.VISIBLE
+                        progressBarUpload.visibility = View.GONE
+                    }
+                    Log.e("Error", result.exception.toString())
+                    Toast.makeText(
+                        baseContext,
+                        "Failed to upload data",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
     }
 
     private fun handleImageSelectionResult(data: Intent) {
-        binding.apply {
-            placeholderImg.visibility = View.GONE
-            selectorTv1.visibility = View.GONE
-            selectorTv2.visibility = View.GONE
-            progressBar.visibility = View.VISIBLE
-        }
-
         if (data.clipData != null) {
             // Multiple images selected
             val count = data.clipData!!.itemCount
             for (i in 0 until count) {
                 val imageUri = data.clipData!!.getItemAt(i).uri
-                uploadImageToFirebaseStorage(imageUri)
+                viewModel.uploadImageToFirebaseStorage(imageUri, ::getFileExtension)
+               // uploadImageToFirebaseStorage(imageUri)
             }
         } else if (data.data != null) {
             // Single image selected
             val imageUri = data.data!!
-            uploadImageToFirebaseStorage(imageUri)
+            viewModel.uploadImageToFirebaseStorage(imageUri, ::getFileExtension)
+            //uploadImageToFirebaseStorage(imageUri)
 
         }
     }
@@ -118,14 +169,22 @@ class OffbeatDetailsActivity : AppCompatActivity() {
         }
 
         binding.btnUpload.setOnClickListener {
-            val name = binding.locationNameEdt.text.toString()
+            val locationName = binding.locationNameEdt.text.toString()
             val description = binding.descriptionEdt.text.toString()
             val stayDuration = binding.durationEdt.text.toString()
             val bestTime = binding.bestTimeEdt.text.toString()
             val address = binding.directionNotesEdt.text.toString()
             val id = FirebaseAuth.getInstance().currentUser!!.uid
-            if (name.isNotEmpty() && description.isNotEmpty() && address.isNotEmpty()) {
-                addOffbeatLocationDetails(name, description, stayDuration, bestTime, address, id)
+            if (locationName.isNotEmpty() && description.isNotEmpty() && address.isNotEmpty()) {
+                val sharedPrefManager = SharedPrefManager(this)
+                val userName = sharedPrefManager.getUserName()?:""
+                val offbeatDetails = OffbeatDetail(
+                    id, userName, locationName,  description, stayDuration, bestTime, address, photoUrls,
+                    latitude,
+                    longitude
+                )
+                viewModel.addOffbeatLocation(id,offbeatDetails)
+               // addOffbeatLocationDetails(offbeatDetails)
             } else if (photoUrls.isEmpty()) {
                 Toast.makeText(baseContext, "Please select atleast one image", Toast.LENGTH_SHORT)
                     .show()

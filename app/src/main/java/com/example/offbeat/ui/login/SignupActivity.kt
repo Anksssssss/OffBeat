@@ -3,8 +3,10 @@ package com.example.offbeat.ui.login
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -19,6 +21,7 @@ class SignupActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySignupBinding
     private lateinit var auth: FirebaseAuth
+    private val viewModel: UserViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,41 +35,94 @@ class SignupActivity : AppCompatActivity() {
         }
 
         auth = FirebaseAuth.getInstance()
+        setListeners()
+        setObservers()
+    }
 
-
+    private fun setListeners() {
         binding.btnSignUp.setOnClickListener {
             val email = binding.emailEdt.text.toString()
             val password = binding.passwordEdt.text.toString()
+            val confirmPassword = binding.confirmPasswordEdt.text.toString()
             val name = binding.nameEdt.text.toString()
-            if (verified(email, password, name)) {
-                signUp(email, password, name)
+            if (isInputValid(email, password, confirmPassword, name)) {
+                viewModel.signUp(email,password,name)
             }
-
         }
     }
 
-    private fun verified(email: String, password: String, name: String): Boolean {
-        if (email.isEmpty()) {
-            Toast.makeText(baseContext, "Email is required.", Toast.LENGTH_SHORT).show()
-            return false
+    private fun setObservers(){
+        viewModel.signupResult.observe(this){result->
+            when(result){
+                is Result.Loading->{
+                    showLoading(true)
+                }
+                is Result.Success->{
+                    showLoading(false)
+                    Log.d("SignUp", "createUserWithEmail:success")
+                    Toast.makeText(baseContext, "Sign Up Successful.", Toast.LENGTH_SHORT)
+                        .show()
+                    auth.signOut()
+                    //saveUserToSharedPref()
+                    navigateToLogin()
+                }
+                is Result.Error -> {
+                    showLoading(false)
+                    Log.d("SignUp", result.message.toString())
+                    Toast.makeText(baseContext, result.message, Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
         }
-        if (password.isEmpty()) {
-            Toast.makeText(baseContext, "Password is required.", Toast.LENGTH_SHORT).show()
-            return false
+    }
+
+    private fun isInputValid(email: String, password: String, cnfPassword: String, name: String): Boolean {
+        return when {
+            email.isEmpty() -> {
+                showToast("Email is required.")
+                false
+            }
+            password.isEmpty() -> {
+                showToast("Password is required.")
+                false
+            }
+
+            password.length < 6 -> {
+                showToast("Password must be at least 6 characters.")
+                false
+            }
+            password != cnfPassword -> {
+                showToast("Passwords do not match.")
+                false
+            }
+            name.isEmpty() -> {
+                showToast("Name is required.")
+                false
+            }
+            else -> true
         }
-        if (password.length < 6) {
-            Toast.makeText(
-                baseContext,
-                "Password must be at least 6 characters.",
-                Toast.LENGTH_SHORT
-            ).show()
-            return false
-        }
-        if (binding.nameEdt.text.toString().isEmpty()) {
-            Toast.makeText(baseContext, "Name is required.", Toast.LENGTH_SHORT).show()
-            return false
-        }
-        return true
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+        binding.btnSignUp.visibility =  if (isLoading) View.GONE else View.VISIBLE
+    }
+
+    private fun saveUserToSharedPref() {
+        val sharedPrefManager = SharedPrefManager(this)
+        val name = binding.nameEdt.text.toString()
+        val email = binding.emailEdt.text.toString()
+        sharedPrefManager.saveUser(name, email)
+    }
+
+    private fun navigateToLogin() {
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(baseContext, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun signUp(email: String, password: String, name: String) {

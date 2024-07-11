@@ -72,6 +72,17 @@ class MainActivity : AppCompatActivity(), OnItemClickListener {
                 }
             }
         }
+        viewModel.signOutStatus.observe(this){
+            if(it){
+                val sharedPrefManager = SharedPrefManager(this)
+                sharedPrefManager.clearuser()
+                val intent = Intent(this, LoginActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
+                startActivity(intent)
+                finish()
+            }
+        }
     }
 
     private fun initView() {
@@ -94,14 +105,15 @@ class MainActivity : AppCompatActivity(), OnItemClickListener {
 
     private fun setListeners() {
         binding.btnSighOut.setOnClickListener {
-            FirebaseAuth.getInstance().signOut()
-            val sharedPrefManager = SharedPrefManager(this)
-            sharedPrefManager.clearuser()
-            val intent = Intent(this, LoginActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
-            startActivity(intent)
-            finish()
+            viewModel.signOut()
+//            FirebaseAuth.getInstance().signOut()
+//            val sharedPrefManager = SharedPrefManager(this)
+//            sharedPrefManager.clearuser()
+//            val intent = Intent(this, LoginActivity::class.java).apply {
+//                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//            }
+//            startActivity(intent)
+//            finish()
         }
         binding.fab.setOnClickListener {
             val intent = Intent(this, OffbeatDetailsActivity::class.java)

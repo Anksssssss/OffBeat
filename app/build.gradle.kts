@@ -68,6 +68,9 @@ dependencies {
     // Also add the dependency for the Google Play services library and specify its version
     implementation("com.google.android.gms:play-services-auth:21.2.0")
 
+    implementation ("com.google.firebase:firebase-auth:21.0.1")
+    implementation ("com.google.firebase:firebase-firestore:24.0.1")
+
     implementation ("com.github.bumptech.glide:glide:4.12.0")
 
     implementation("com.github.denzcoskun:ImageSlideshow:0.1.2")
