@@ -5,6 +5,7 @@ import android.widget.Toast
 import com.example.offbeat.models.OffbeatDetail
 import com.example.offbeat.models.Review
 import com.example.offbeat.utils.Result
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
@@ -56,16 +57,27 @@ object OffbeatLocationRepo {
         }
     }
 
-    suspend fun fetchOffbeatLocations(): Result<List<OffbeatDetail>> {
+    suspend fun fetchOffbeatLocations(
+        lastDoc: DocumentSnapshot? = null,
+        pageSize:Long = 10
+    ):Result<Pair<List<OffbeatDetail>, DocumentSnapshot?>> {
         return try {
-            val result = db.collection("OffBeatLocations").get().await()
+            val query = db.collection("OffBeatLocations")
+                .limit(pageSize)
+            val result = if(lastDoc!= null) {
+                query.startAfter(lastDoc).get().await()
+            } else {
+                query.get().await()
+            }
+           // val result = db.collection("OffBeatLocations").get().await()
             val locations = mutableListOf<OffbeatDetail>()
             for (document in result) {
                 val offBeatDetail = document.toObject(OffbeatDetail::class.java)
                 offBeatDetail.offBeatId = document.id
                 locations.add(offBeatDetail)
             }
-            Result.Success(locations)
+            val lastVisible = result.documents.lastOrNull()
+            Result.Success(Pair(locations, lastVisible))
         } catch (e: Exception) {
             Result.Error(e)
         }

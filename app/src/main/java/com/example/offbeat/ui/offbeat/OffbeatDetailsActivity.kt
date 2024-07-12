@@ -113,7 +113,7 @@ class OffbeatDetailsActivity : AppCompatActivity() {
                     Log.d("Upload", "Offbeat location data added to Firestore")
                     Toast.makeText(baseContext, "Upload Successful", Toast.LENGTH_SHORT)
                         .show()
-                    startActivity(Intent(this, MainActivity::class.java))
+                   // startActivity(Intent(this, MainActivity::class.java))
                     finish()
                 }
                 is com.example.offbeat.utils.Result.Error -> {

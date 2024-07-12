@@ -2,6 +2,7 @@ package com.example.offbeat
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -10,6 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.offbeat.adapter.PostsAdapter
 import com.example.offbeat.databinding.ActivityMainBinding
 import com.example.offbeat.models.OffbeatDetail
@@ -43,14 +45,24 @@ class MainActivity : AppCompatActivity(), OnItemClickListener {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Reset data when returning to the activity
+        viewModel.fetchOffbeatLocations(reset = true)
+    }
+
     private fun setObservers() {
         viewModel.offBeatLocations.observe(this) { result ->
             when (result) {
                 is Result.Loading -> {
                     binding.apply {
-                        recyclerViewMain.visibility = View.GONE
-                        progressBar.visibility = View.VISIBLE
-                        ErrorTv.visibility = View.GONE
+                        if(postsAdapter.currentList.isEmpty()) {
+                            recyclerViewMain.visibility = View.GONE
+                            progressBar.visibility = View.VISIBLE
+                            ErrorTv.visibility = View.GONE
+                        }else{
+                            nextProgressBar.visibility = View.VISIBLE
+                        }
                     }
                 }
 
@@ -59,7 +71,9 @@ class MainActivity : AppCompatActivity(), OnItemClickListener {
                         recyclerViewMain.visibility = View.VISIBLE
                         progressBar.visibility = View.GONE
                         ErrorTv.visibility = View.GONE
+                        nextProgressBar.visibility = View.GONE
                     }
+                    Log.d("MainActivity", "data size ${result.data}")
                     postsAdapter.submitList(result.data)
                 }
 
@@ -100,6 +114,19 @@ class MainActivity : AppCompatActivity(), OnItemClickListener {
                 false
             )
             adapter = postsAdapter
+
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                    val totalItemCount = layoutManager.itemCount
+                    val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
+
+                    if (lastVisibleItem + 1 >= totalItemCount) {
+                        viewModel.fetchNextPage()
+                    }
+                }
+            })
         }
     }
 
