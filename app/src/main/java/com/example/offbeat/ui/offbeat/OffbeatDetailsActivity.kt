@@ -175,13 +175,17 @@ class OffbeatDetailsActivity : AppCompatActivity() {
             val bestTime = binding.bestTimeEdt.text.toString()
             val address = binding.directionNotesEdt.text.toString()
             val id = FirebaseAuth.getInstance().currentUser!!.uid
-            if (locationName.isNotEmpty() && description.isNotEmpty() && address.isNotEmpty()) {
+            val state = binding.stateEdt.text.toString()
+            val city = binding.cityEdt.text.toString()
+            if (locationName.isNotEmpty() && description.isNotEmpty() && address.isNotEmpty() && state.isNotEmpty() && city.isNotEmpty()) {
                 val sharedPrefManager = SharedPrefManager(this)
                 val userName = sharedPrefManager.getUserName()?:""
                 val offbeatDetails = OffbeatDetail(
                     id, userName, locationName,  description, stayDuration, bestTime, address, photoUrls,
                     latitude,
-                    longitude
+                    longitude,
+                    state,
+                    city
                 )
                 viewModel.addOffbeatLocation(id,offbeatDetails)
                // addOffbeatLocationDetails(offbeatDetails)
@@ -192,51 +196,55 @@ class OffbeatDetailsActivity : AppCompatActivity() {
                 Toast.makeText(baseContext, "Please fill all the fields", Toast.LENGTH_SHORT).show()
             }
         }
+
+        binding.btnBack.setOnClickListener {
+            finish()
+        }
     }
 
 
-    private fun addOffbeatLocationDetails(
-        locationName: String,
-        description: String,
-        stayDuration: String,
-        bestTime: String,
-        address: String,
-        id: String
-    ) {
-        val sharedPrefManager = SharedPrefManager(this)
-        val name = sharedPrefManager.getUserName()?:""
-        val offbeatDetails = OffbeatDetail(
-            id, name, locationName,  description, stayDuration, bestTime, address, photoUrls,
-            latitude,
-            longitude
-        )
-        val db = FirebaseFirestore.getInstance()
-
-
-        db.collection("users").document(id)
-            .collection("OffBeatLocations")
-            .add(offbeatDetails).addOnSuccessListener {
-                db.collection("OffBeatLocations")
-                    .add(offbeatDetails)
-                    .addOnSuccessListener {
-                        Log.d("Upload", "Offbeat location data added to Firestore")
-                        Toast.makeText(baseContext, "Upload Successful", Toast.LENGTH_SHORT)
-                            .show()
-                        startActivity(Intent(this, MainActivity::class.java))
-                        finish()
-
-                    }.addOnFailureListener { e ->
-                        Log.w("Upload", "Error adding offbeat location to Firestore", e)
-                        Toast.makeText(
-                            baseContext,
-                            "Failed to upload ${e.message}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-            }.addOnFailureListener { e->
-                Log.w("Upload", "Error adding offbeat location to Firestore", e)
-            }
-    }
+//    private fun addOffbeatLocationDetails(
+//        locationName: String,
+//        description: String,
+//        stayDuration: String,
+//        bestTime: String,
+//        address: String,
+//        id: String
+//    ) {
+//        val sharedPrefManager = SharedPrefManager(this)
+//        val name = sharedPrefManager.getUserName()?:""
+//        val offbeatDetails = OffbeatDetail(
+//            id, name, locationName,  description, stayDuration, bestTime, address, photoUrls,
+//            latitude,
+//            longitude, state
+//        )
+//        val db = FirebaseFirestore.getInstance()
+//
+//
+//        db.collection("users").document(id)
+//            .collection("OffBeatLocations")
+//            .add(offbeatDetails).addOnSuccessListener {
+//                db.collection("OffBeatLocations")
+//                    .add(offbeatDetails)
+//                    .addOnSuccessListener {
+//                        Log.d("Upload", "Offbeat location data added to Firestore")
+//                        Toast.makeText(baseContext, "Upload Successful", Toast.LENGTH_SHORT)
+//                            .show()
+//                        startActivity(Intent(this, MainActivity::class.java))
+//                        finish()
+//
+//                    }.addOnFailureListener { e ->
+//                        Log.w("Upload", "Error adding offbeat location to Firestore", e)
+//                        Toast.makeText(
+//                            baseContext,
+//                            "Failed to upload ${e.message}",
+//                            Toast.LENGTH_SHORT
+//                        ).show()
+//                    }
+//            }.addOnFailureListener { e->
+//                Log.w("Upload", "Error adding offbeat location to Firestore", e)
+//            }
+//    }
 
     private fun openFileChooser() {
         val intent = Intent()

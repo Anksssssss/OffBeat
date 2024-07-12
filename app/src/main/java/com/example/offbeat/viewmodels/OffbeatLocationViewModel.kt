@@ -26,7 +26,7 @@ class OffbeatLocationViewModel : ViewModel() {
     private var noMoreData = false
     private var isFetching = false
 
-    fun fetchOffbeatLocations(reset: Boolean = false) {
+    fun fetchOffbeatLocations(reset: Boolean = false, filter: String? = null) {
         if (reset) {
             lastDocument = null
             noMoreData = false
@@ -35,7 +35,7 @@ class OffbeatLocationViewModel : ViewModel() {
         isFetching = true
         _offBeatLocations.value = Result.Loading
         viewModelScope.launch {
-            val result = OffbeatLocationRepo.fetchOffbeatLocations(lastDocument, pageSize)
+            val result = OffbeatLocationRepo.fetchOffbeatLocations(lastDocument, pageSize, filter)
             if (result is Result.Success) {
                 lastDocument = result.data.second
                 _offBeatLocations.value = Result.Success(result.data.first)
@@ -56,14 +56,14 @@ class OffbeatLocationViewModel : ViewModel() {
 
     }
 
-    fun fetchNextPage() {
+    fun fetchNextPage(filter: String?) {
         if (noMoreData || isFetching) return
         isFetching = true
         val currentList =
             (_offBeatLocations.value as? Result.Success)?.data ?: emptyList()
         _offBeatLocations.value = Result.Loading
         viewModelScope.launch {
-            val result = OffbeatLocationRepo.fetchOffbeatLocations(lastDocument, pageSize)
+            val result = OffbeatLocationRepo.fetchOffbeatLocations(lastDocument, pageSize, filter)
             if (result is Result.Success) {
                 Log.d("OffbeatLocationViewModel", result.data.first.size.toString())
                 lastDocument = result.data.second

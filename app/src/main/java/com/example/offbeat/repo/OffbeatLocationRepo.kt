@@ -59,11 +59,20 @@ object OffbeatLocationRepo {
 
     suspend fun fetchOffbeatLocations(
         lastDoc: DocumentSnapshot? = null,
-        pageSize:Long = 10
+        pageSize:Long = 10,
+        filter: String? = null
     ):Result<Pair<List<OffbeatDetail>, DocumentSnapshot?>> {
         return try {
-            val query = db.collection("OffBeatLocations")
+            var query = db.collection("OffBeatLocations")
+                .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
                 .limit(pageSize)
+
+            if(filter != null) {
+                filter?.let {
+                    query = query.whereEqualTo("state", it) // or "city" based on your requirement
+                }
+            }
+
             val result = if(lastDoc!= null) {
                 query.startAfter(lastDoc).get().await()
             } else {

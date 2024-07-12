@@ -103,6 +103,9 @@ class OffbeatInfoActivity : AppCompatActivity() {
             reviewList.add(0,newReview)
             setReviews(reviewList)
         }
+        binding.btnBack.setOnClickListener {
+            finish()
+        }
     }
 
     private fun initView() {
@@ -116,6 +119,11 @@ class OffbeatInfoActivity : AppCompatActivity() {
             locName.text = offBeatLocation.locationName
             locDescription.text = offBeatLocation.description
             directionsNoteTV.text = offBeatLocation.address
+            stateCityTv.text = buildString {
+                append(offBeatLocation.city)
+                append(", ")
+                append(offBeatLocation.state)
+            }
 
             if(offBeatLocation.stayDuration != ""){
                 duration.text = offBeatLocation.stayDuration

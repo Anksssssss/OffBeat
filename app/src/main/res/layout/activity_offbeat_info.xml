@@ -16,6 +16,7 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
     <ImageView
+        android:id="@+id/btnBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/back"
@@ -60,6 +61,16 @@
                 android:layout_marginTop="10dp"/>
 
             <TextView
+                android:id="@+id/stateCityTv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Pune, Maharashtra"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginHorizontal="16dp"/>
+
+            <TextView
                 android:id="@+id/locDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -86,6 +97,7 @@
                 android:layout_marginHorizontal="16dp"
                 android:background="@color/white"
                 android:layout_marginTop="6dp"
+                android:layout_marginBottom="6dp"
                 android:padding="6dp"
                 android:orientation="vertical">
 
@@ -105,6 +117,7 @@
                     android:textColor="@color/text_grey"
                     android:textStyle="bold"
                     android:layout_marginTop="4dp"
+                    android:layout_marginBottom="6dp"
                     android:text="Take left and then right and go straight and then left and then right and there you are."
                     android:textSize="14sp"/>
 

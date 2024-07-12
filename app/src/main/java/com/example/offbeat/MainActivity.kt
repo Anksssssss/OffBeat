@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity(), OnItemClickListener {
     private lateinit var binding: ActivityMainBinding
     private lateinit var postsAdapter: PostsAdapter
     private val viewModel: OffbeatLocationViewModel by viewModels()
+    private var searchByStateorCity = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -63,18 +64,27 @@ class MainActivity : AppCompatActivity(), OnItemClickListener {
                         }else{
                             nextProgressBar.visibility = View.VISIBLE
                         }
+                        Log.d("MainActivity", "Loading")
                     }
                 }
 
                 is Result.Success -> {
                     binding.apply {
-                        recyclerViewMain.visibility = View.VISIBLE
-                        progressBar.visibility = View.GONE
-                        ErrorTv.visibility = View.GONE
-                        nextProgressBar.visibility = View.GONE
+                        if(result.data.isEmpty()){
+                            recyclerViewMain.visibility = View.GONE
+                            progressBar.visibility = View.GONE
+                            ErrorTv.visibility = View.VISIBLE
+                            nextProgressBar.visibility = View.GONE
+                        }else {
+                            recyclerViewMain.visibility = View.VISIBLE
+                            progressBar.visibility = View.GONE
+                            ErrorTv.visibility = View.GONE
+                            nextProgressBar.visibility = View.GONE
+                        }
                     }
                     Log.d("MainActivity", "data size ${result.data}")
                     postsAdapter.submitList(result.data)
+                    Log.d("MainActivity", "Success")
                 }
 
                 is Result.Error -> {
@@ -82,7 +92,10 @@ class MainActivity : AppCompatActivity(), OnItemClickListener {
                         recyclerViewMain.visibility = View.GONE
                         progressBar.visibility = View.GONE
                         ErrorTv.visibility = View.VISIBLE
+                        nextProgressBar.visibility = View.GONE
+                        ErrorTv.text = result.exception.localizedMessage
                     }
+                    Log.d("MainActivity", "Error")
                 }
             }
         }
@@ -123,7 +136,7 @@ class MainActivity : AppCompatActivity(), OnItemClickListener {
                     val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
 
                     if (lastVisibleItem + 1 >= totalItemCount) {
-                        viewModel.fetchNextPage()
+                        viewModel.fetchNextPage(searchByStateorCity)
                     }
                 }
             })
@@ -133,18 +146,27 @@ class MainActivity : AppCompatActivity(), OnItemClickListener {
     private fun setListeners() {
         binding.btnSighOut.setOnClickListener {
             viewModel.signOut()
-//            FirebaseAuth.getInstance().signOut()
-//            val sharedPrefManager = SharedPrefManager(this)
-//            sharedPrefManager.clearuser()
-//            val intent = Intent(this, LoginActivity::class.java).apply {
-//                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-//            }
-//            startActivity(intent)
-//            finish()
         }
         binding.fab.setOnClickListener {
             val intent = Intent(this, OffbeatDetailsActivity::class.java)
             startActivity(intent)
+        }
+        binding.btnSearch.setOnClickListener {
+            val searchText = binding.searchEdt.text.toString()
+            if(searchText.isNotEmpty()) {
+                searchByStateorCity = searchText.toString()
+                viewModel.fetchOffbeatLocations(true,searchText.toString())
+                binding.clearFilterTv.visibility = View.VISIBLE
+            }
+        }
+
+        binding.clearFilterTv.setOnClickListener {
+            binding.apply {
+                viewModel.fetchOffbeatLocations(true)
+                searchEdt.setText("")
+                searchByStateorCity = ""
+                clearFilterTv.visibility = View.GONE
+            }
         }
     }
 
