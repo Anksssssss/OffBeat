@@ -44,7 +44,7 @@ class LoginActivity : AppCompatActivity() {
             startActivity(Intent(this, MainActivity::class.java))
             finish()
         }
-        setListners()
+        setListeners()
         setObservers()
     }
 
@@ -70,7 +70,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun setListners() {
+    private fun setListeners() {
         binding.registerTv.setOnClickListener {
             val intent = Intent(this, SignupActivity::class.java)
             startActivity(intent)
@@ -125,44 +125,4 @@ class LoginActivity : AppCompatActivity() {
         Toast.makeText(baseContext, message, Toast.LENGTH_SHORT).show()
     }
 
-
-    private fun signIn(email: String, password: String) {
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    // Sign in success
-                    Log.d("SignIn", "signInWithEmail:success")
-                    val user = auth.currentUser
-                    val sharedPrefManager = SharedPrefManager(this)
-                    val db = FirebaseFirestore.getInstance()
-                    db.collection("users").document(user!!.uid)
-                        .get()
-                        .addOnSuccessListener { document ->
-                            val user = document.toObject(User::class.java)
-                            sharedPrefManager.saveUser(user!!.name, user!!.email)
-                            Toast.makeText(baseContext, "Sign In Successful.", Toast.LENGTH_SHORT)
-                                .show()
-                            val intent = Intent(this, MainActivity::class.java)
-                            startActivity(intent)
-                            finish()
-                        }.addOnFailureListener {
-                            FirebaseAuth.getInstance().signOut()
-                            Toast.makeText(
-                                baseContext,
-                                "Sign In Failed: ${it.message}",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w("SignIn", "signInWithEmail:failure", task.exception)
-                    Toast.makeText(
-                        baseContext,
-                        "Sign In Failed: ${task.exception?.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-    }
 }

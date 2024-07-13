@@ -30,35 +30,6 @@ class OffbeatInformationViewModel : ViewModel() {
         viewModelScope.launch {
             val result = OffbeatLocationRepo.addReview(review,docId)
             _addReviewResult.value = result
-
-//            try {
-//                val offbeatDetailRef = db.collection("OffBeatLocations").document(docId)
-//                offbeatDetailRef.get()
-//                    .addOnSuccessListener { document ->
-//                        if (document.exists()) {
-//                            val offBeatDetail = document.toObject(OffbeatDetail::class.java)
-//                            offBeatDetail!!.reviewList.add(0, review)
-//                            offbeatDetailRef.set(offBeatDetail).addOnSuccessListener {
-//                                _addReviewResult.value = Result.Success(Unit)
-//                                Log.d("Upload", "Review added successfully")
-//                            }.addOnFailureListener { e ->
-//                                _addReviewResult.value = Result.Error(e)
-//                                Log.w("Upload", "Error adding review to Firestore", e)
-//                            }
-//                        } else {
-//                            _addReviewResult.value =
-//                                Result.Error(Exception("Document does not exist"))
-//                            Log.d("Upload", "Document does not exist")
-//                        }
-//                    }.addOnFailureListener { e ->
-//                        {
-//                            _addReviewResult.value = Result.Error(e)
-//                        }
-//                    }
-//            } catch (e: Exception) {
-//                _addReviewResult.value = Result.Error(e)
-//                Log.w("Upload", "Error adding review to Firestore", e)
-//            }
         }
     }
 
@@ -82,7 +53,4 @@ class OffbeatInformationViewModel : ViewModel() {
             }
         }
     }
-
-
-
 }

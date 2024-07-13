@@ -33,9 +33,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
-        // Places.initialize(applicationContext, "AIzaSyBBXMVGlYT9D6PtB6pNHjBAmUAahb-9wwY")
-
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.mapFrag) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -87,13 +84,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(p0: GoogleMap) {
         mMap = p0
         val location = LatLng(28.7041, 77.1025)
-//        mMap.addMarker(MarkerOptions().position(location).title("Marker in Delhi"))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(location))
-
-//        mMap.setOnCameraIdleListener {
-//            val centerPosition = mMap.cameraPosition.target
-//            mMap.clear()
-//            mMap.addMarker(MarkerOptions().position(centerPosition).title(""))
-//        }
     }
 }

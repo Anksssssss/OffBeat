@@ -139,14 +139,11 @@ class OffbeatDetailsActivity : AppCompatActivity() {
             for (i in 0 until count) {
                 val imageUri = data.clipData!!.getItemAt(i).uri
                 viewModel.uploadImageToFirebaseStorage(imageUri, ::getFileExtension)
-               // uploadImageToFirebaseStorage(imageUri)
             }
         } else if (data.data != null) {
             // Single image selected
             val imageUri = data.data!!
             viewModel.uploadImageToFirebaseStorage(imageUri, ::getFileExtension)
-            //uploadImageToFirebaseStorage(imageUri)
-
         }
     }
 
@@ -203,79 +200,14 @@ class OffbeatDetailsActivity : AppCompatActivity() {
     }
 
 
-//    private fun addOffbeatLocationDetails(
-//        locationName: String,
-//        description: String,
-//        stayDuration: String,
-//        bestTime: String,
-//        address: String,
-//        id: String
-//    ) {
-//        val sharedPrefManager = SharedPrefManager(this)
-//        val name = sharedPrefManager.getUserName()?:""
-//        val offbeatDetails = OffbeatDetail(
-//            id, name, locationName,  description, stayDuration, bestTime, address, photoUrls,
-//            latitude,
-//            longitude, state
-//        )
-//        val db = FirebaseFirestore.getInstance()
-//
-//
-//        db.collection("users").document(id)
-//            .collection("OffBeatLocations")
-//            .add(offbeatDetails).addOnSuccessListener {
-//                db.collection("OffBeatLocations")
-//                    .add(offbeatDetails)
-//                    .addOnSuccessListener {
-//                        Log.d("Upload", "Offbeat location data added to Firestore")
-//                        Toast.makeText(baseContext, "Upload Successful", Toast.LENGTH_SHORT)
-//                            .show()
-//                        startActivity(Intent(this, MainActivity::class.java))
-//                        finish()
-//
-//                    }.addOnFailureListener { e ->
-//                        Log.w("Upload", "Error adding offbeat location to Firestore", e)
-//                        Toast.makeText(
-//                            baseContext,
-//                            "Failed to upload ${e.message}",
-//                            Toast.LENGTH_SHORT
-//                        ).show()
-//                    }
-//            }.addOnFailureListener { e->
-//                Log.w("Upload", "Error adding offbeat location to Firestore", e)
-//            }
-//    }
-
     private fun openFileChooser() {
         val intent = Intent()
         intent.type = "image/*"
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
         intent.action = Intent.ACTION_GET_CONTENT
         imageActivityResultLauncher.launch(Intent.createChooser(intent, "Select Picture"))
-        // startActivityForResult(Intent.createChooser(intent, "Select Picture"), 100)
     }
 
-    private fun uploadImageToFirebaseStorage(imageUri: Uri) {
-        val storageReference = FirebaseStorage.getInstance().reference
-        val fileReference = storageReference.child(
-            "uploads/${System.currentTimeMillis()}.${
-                getFileExtension(imageUri)
-            }"
-        )
-
-        fileReference.putFile(imageUri)
-            .addOnSuccessListener { taskSnapshot ->
-                fileReference.downloadUrl.addOnSuccessListener { uri ->
-                    val downloadUrl = uri.toString()
-                    // Store the download URL in Firestore
-                    storeImageUrlInFirestore(downloadUrl)
-                }
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Failed to upload image: ${e.message}", Toast.LENGTH_SHORT)
-                    .show()
-            }
-    }
 
     private fun getFileExtension(uri: Uri): String? {
         val contentResolver = contentResolver
@@ -286,7 +218,6 @@ class OffbeatDetailsActivity : AppCompatActivity() {
     private fun storeImageUrlInFirestore(downloadUrl: String) {
         photoUrls.add(downloadUrl)
         photosAdapter.notifyDataSetChanged()
-        // You can update the UI or proceed with storing the location details once all images are uploaded
         binding.apply {
             progressBar.visibility = View.GONE
             selectPicsRv.visibility = View.VISIBLE
